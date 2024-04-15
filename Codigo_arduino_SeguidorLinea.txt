@@ -1,0 +1,114 @@
+//Pines del motor
+#define M2 2
+#define M22 4//direccion
+#define M1 10
+#define M11 12
+#define PWM2 3//control 
+#define PWM1 11
+
+//almacenar lecturas analogias 
+int s1,s2,s3,s4;
+int si2,sic,sdc,sd2;
+int cal;
+
+void setup() {
+// put your setup code here, to run once:
+Serial.begin(9600);
+pinMode(13,OUTPUT);
+pinMode(M1,OUTPUT);
+pinMode(M11,OUTPUT);
+pinMode(M2,OUTPUT);
+pinMode(M22,OUTPUT);
+calibrar();
+}
+
+void loop() {
+lectura();
+//adelante(100,200);
+if (si2==1)
+{
+  izquierda(100);
+  }
+if (sd2==1)
+{
+  derecha(100);
+  }
+if (sic==1 && sdc==1)
+{
+  adelante(120,120);
+  }
+if (sic==0 && sdc==1)
+{
+  adelante(120,90);
+  }
+if (sic==1 && sdc==0)
+{
+  adelante(90,120);
+  }  
+}
+
+void lectura()
+{
+s1=analogRead(3);  
+s2=analogRead(4);  
+s3=analogRead(5);  
+s4=analogRead(6);
+if(s1<cal) si2=0;
+if(s1>cal) si2=1;
+if(s2<cal) sic=0;
+if(s2>cal) sic=1;
+if(s3<cal) sdc=0;
+if(s3>cal) sdc=1;
+if(s4<cal) sd2=0;
+if(s4>cal) sd2=1;
+
+}
+
+void calibrar()//calibrar en funcion del ambiente
+{
+delay(2000); 
+digitalWrite(13,HIGH);
+delay(200);
+digitalWrite(13,LOW);
+delay(200);
+digitalWrite(13,HIGH);
+s1=analogRead(3);  
+s2=analogRead(4);  
+s3=analogRead(5);  
+s4=analogRead(6);  
+int suma1=(s1+s4)/2;
+int suma2=(s3+s2)/2;
+cal=(suma1+suma2)/2;
+Serial.println(cal);
+delay(1000); 
+digitalWrite(13,LOW);  
+}
+ 
+void adelante(int vel1,int vel2)
+{
+digitalWrite(M11,HIGH);
+digitalWrite(M1,LOW);
+analogWrite(PWM1,vel1);
+digitalWrite(M22,HIGH);
+digitalWrite(M2,LOW);
+analogWrite(PWM2,vel2);
+}
+
+void izquierda(int vel)
+{
+digitalWrite(M1,HIGH);
+digitalWrite(M11,LOW);
+analogWrite(PWM1,vel);
+digitalWrite(M22,HIGH);
+digitalWrite(M2,LOW);
+analogWrite(PWM2,vel);
+}
+void derecha(int vel)
+{
+digitalWrite(M11,HIGH);
+digitalWrite(M1,LOW);
+analogWrite(PWM1,vel);
+digitalWrite(M2,HIGH);
+digitalWrite(M22,LOW);
+analogWrite(PWM2,vel);
+}
